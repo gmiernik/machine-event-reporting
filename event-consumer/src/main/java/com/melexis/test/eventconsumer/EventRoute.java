@@ -12,7 +12,8 @@ public class EventRoute extends RouteBuilder {
 
 	@Override
 	public void configure() throws Exception {
-		from("activemq:" + activemqQueue)
+		from("activemq:queue://machine.event")
+		.log("${body}")
 		.to("mock:test");
 	}
 

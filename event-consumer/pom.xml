@@ -47,6 +47,16 @@
 			<artifactId>camel-test-spring</artifactId>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<artifactId>model</artifactId>
+			<groupId>com.melexis.test</groupId>
+			<version>0.0.2-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<artifactId>generator</artifactId>
+			<groupId>com.melexis.test</groupId>
+			<version>0.0.2-SNAPSHOT</version>
+		</dependency>
 	</dependencies>
 	<build>
 		<plugins>

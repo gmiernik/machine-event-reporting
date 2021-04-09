@@ -1,9 +1,13 @@
-package com.melexis.test.eventconsumer;
+package com.melexis.test;
+
+import java.time.LocalDateTime;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.EndpointInject;
 import org.apache.camel.Produce;
 import org.apache.camel.ProducerTemplate;
+import org.apache.camel.builder.NotifyBuilder;
 import org.apache.camel.component.mock.MockEndpoint;
 import org.apache.camel.test.spring.CamelSpringBootRunner;
 import org.junit.jupiter.api.Test;
@@ -14,12 +18,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.melexis.test.eventconsumer.Application;
 
 @RunWith(CamelSpringBootRunner.class)
 @DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
 @SpringBootTest(classes = {Application.class})
-class EventRouteTest {
+class MachineEventIntegrationTest {
 		
 	@Autowired
     protected CamelContext camelContext;
@@ -30,13 +35,29 @@ class EventRouteTest {
 	@Value("${activemq.queue}")
 	private String activemqQueue;
 	
+	@Value("${camel.component.activemq.broker-url}")
+	private String activemqBrokerUrl;
+	
 	@EndpointInject("mock:test")
 	protected MockEndpoint testMock;
 	
+	private static final ObjectMapper objectMapper = new ObjectMapper();
+	
 	@Test
-	void testSendToQueue() throws Exception {
-		testMock.expectedMessageCount(1);
-		eventQueue.sendBody("activemq:" + activemqQueue, "test");
+	void testSendToMachineEvent() throws Exception {
+		MachineEventVO machineEventVO = new MachineEventVO();
+        machineEventVO.setMachineID("MACHINE_1");
+        machineEventVO.setDateTime(LocalDateTime.now());
+        machineEventVO.setErrorType(ErrorType.TEMPERATURE_ERROR);
+        machineEventVO.setMachineType(MachineType.MACHINE_TYPE2);
+
+        testMock.expectedMessageCount(1);
+
+		MessageHandler messageHandler = new MessageHandler();
+        messageHandler.initialize(activemqBrokerUrl, activemqQueue);
+        messageHandler.postMessage(objectMapper.writeValueAsString(machineEventVO));
+		messageHandler.tearDown();
+        
 		testMock.assertIsSatisfied();
 	}
 	
