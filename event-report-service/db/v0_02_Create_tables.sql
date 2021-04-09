@@ -1,6 +1,6 @@
 -- create table for EventDefinition
 CREATE TABLE IF NOT EXISTS machine_event.error_definition (
-	code integer NOT NULL,
+	code integer NOT NULL GENERATED ALWAYS AS IDENTITY,
 	detail varchar NULL,
 	CONSTRAINT error_definition_pk PRIMARY KEY (code)
 );
