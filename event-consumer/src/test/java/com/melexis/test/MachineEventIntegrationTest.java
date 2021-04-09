@@ -1,6 +1,9 @@
 package com.melexis.test;
 
+import static org.junit.Assert.assertNotNull;
+
 import java.time.LocalDateTime;
+import java.time.format.FormatStyle;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.camel.CamelContext;
@@ -18,7 +21,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.melexis.test.eventconsumer.Application;
 
 @RunWith(CamelSpringBootRunner.class)
@@ -59,6 +66,13 @@ class MachineEventIntegrationTest {
 		messageHandler.tearDown();
         
 		testMock.assertIsSatisfied();
+		
+		String test = objectMapper.writeValueAsString(machineEventVO);
+
+		MachineEventVO test2 = objectMapper.readValue(test, MachineEventVO.class);
+				
+		
+		assertNotNull(test2);
 	}
 	
 }
